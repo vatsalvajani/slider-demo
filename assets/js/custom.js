@@ -1,7 +1,10 @@
 var heroSwiper = new Swiper('.hero-slider', {
     loop: true,
     speed: 600,
-    autoplay: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
     watchSlidesProgress: true,
     pagination: {
         el: '.swiper-pagination',
@@ -15,27 +18,35 @@ var heroSwiper = new Swiper('.hero-slider', {
         0:   { navigation: { enabled: false } },
         576: { slidesPerView: 1 }
     },
-    // Add this event listener to handle video playback smoothly
     on: {
         init: function () {
-            // Find video in the initially active visible slide and play it
-            const activeVideo = this.el.querySelector('.swiper-slide-active video');
-            if (activeVideo) {
-                activeVideo.play().catch(err => console.log("Init play blocked:", err));
+            // Force play on init for the current active slide
+            const activeSlide = this.el.querySelector('.swiper-slide-active');
+            if (activeSlide) {
+                const video = activeSlide.querySelector('video');
+                if (video) video.play().catch(e => console.log('Init play deferred:', e));
             }
         },
-        slideChangeTransitionEnd: function () {
-            // Stop all slider videos first to prevent ghost audio/background processes
-            const allVideos = this.el.querySelectorAll('video');
-            allVideos.forEach(video => video.pause());
-
-            // Target ONLY the video in the active visible slide
-            const activeVideo = this.el.querySelector('.swiper-slide-active video');
-            if (activeVideo) {
-                activeVideo.play().catch(err => {
-                    console.log("Autoplay was prevented by Safari:", err);
-                });
-            }
+        slideChangeTransitionStart: function () {
+            // Target the upcoming active slide immediately as the transition starts
+            // Swiper updates classes at the start of the slide transition
+            setTimeout(() => {
+                const activeSlide = this.el.querySelector('.swiper-slide-active');
+                if (activeSlide) {
+                    const video = activeSlide.querySelector('video');
+                    if (video) {
+                        // Reset video runtime back to 0 so it plays from the beginning on slide entry
+                        video.currentTime = 0; 
+                        var playPromise = video.play();
+                        
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                console.log("Safari auto-play restriction intercepted: ", error);
+                            });
+                        }
+                    }
+                }
+            }, 50); // Small 50ms macro-task delay ensures Swiper DOM manipulation has finished updating classes
         }
     }
 });
