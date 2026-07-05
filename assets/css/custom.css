@@ -291,6 +291,45 @@ a{
     height: 4px;
 }
 
+
+/* Ensure Safari recognizes the video has layout dimensions immediately */
+.hero-slider .swiper-slide video {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover; /* Keeps your background looking perfect */
+    
+    /* Force Safari to create a hardware-accelerated composition layer */
+    -webkit-transform: translate3d(0, 0, 0) !important;
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Fix for parent containers that might be collapsing */
+.banner-bg-video {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1; /* Keeps it behind your text content */
+}
+
+/* Prevent the decorative overlay from blocking Safari's visibility scanner */
+.slider-bg {
+    pointer-events: none !important;
+}
+
+/* Ensure the video itself doesn't trap touch events */
+.banner-video {
+    pointer-events: none !important;
+}
+
 @media (max-width: 1440px) {
     .hero-slider .swiper-button-prev{
         left: 50px;

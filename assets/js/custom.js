@@ -28,25 +28,22 @@ var heroSwiper = new Swiper('.hero-slider', {
             }
         },
         slideChangeTransitionStart: function () {
-            // Target the upcoming active slide immediately as the transition starts
-            // Swiper updates classes at the start of the slide transition
-            setTimeout(() => {
-                const activeSlide = this.el.querySelector('.swiper-slide-active');
-                if (activeSlide) {
-                    const video = activeSlide.querySelector('video');
-                    if (video) {
-                        // Reset video runtime back to 0 so it plays from the beginning on slide entry
-                        video.currentTime = 0; 
-                        var playPromise = video.play();
-                        
-                        if (playPromise !== undefined) {
-                            playPromise.catch(error => {
-                                console.log("Safari auto-play restriction intercepted: ", error);
+            const activeSlide = this.el.querySelector('.swiper-slide-active');
+            if (activeSlide) {
+                const video = activeSlide.querySelector('video');
+                if (video) {
+                    video.muted = true; // Hard re-enforce silence for Safari
+                    
+                    // Wait for Safari's CSS rendering engine to paint the slide completely
+                    window.requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            video.play().catch(err => {
+                                console.log("CSS or Engine restriction caught:", err);
                             });
-                        }
-                    }
+                        }, 100); // 100ms cushion allows custom.css animations to finish
+                    });
                 }
-            }, 50); // Small 50ms macro-task delay ensures Swiper DOM manipulation has finished updating classes
+            }
         }
     }
 });
