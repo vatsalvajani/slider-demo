@@ -1,0 +1,350 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root{
+	--black: #000;
+	--blue: #1863A5;
+	--dark-blue: #032A4E;
+	--main-brand: #1567B1;
+    --verticle-line: #014683;
+	--green-clr: #527C17;
+    --parrot-green: #92C945;
+	--light-green-clr: #E8FFC7;
+	--white: #fff;
+	--light-blue: #D5EBFF;
+	--title-gradient: linear-gradient(90deg, #1567B1 0%, #6CA71A 100%);
+	--title-light-gradient: linear-gradient(90deg, #FFFFFF 0%, #E2FFB9 100%);
+	--section-bg: linear-gradient(270deg, #97ce4600 0%, #1160A11A 100%);;
+	--grey-clr: #878787;
+	--dark-grey: #666666;
+	--light-grey: #f0f0f0;
+    --brd-clr: #F3F3F3;
+    --ice-white: #F8FCFF;
+    --dark-heather-grey: #484848;
+    --search-bg: #F7F7F7;
+    --platinum: #E5E5E5;
+    --solitude: #EBF7FF;
+	--banner-gradient: linear-gradient(270deg, rgba(0, 0, 0, 0) 0%, #032A4E 100%);
+    --grid-gradient: linear-gradient(180deg, rgba(3, 42, 78, 0) -29.29%, #032A4E 100%);
+    --faq-gradient: linear-gradient(90deg, rgba(24, 99, 165, 0) 0%, #1863A5 100%);
+}
+
+body{
+	font-family: "Roboto", sans-serif;
+	font-size: 16px;
+	line-height: 26px;
+	color: var(--grey-clr);
+}
+
+a{
+	text-decoration: none;
+}
+/* BANNER SECTION */
+
+/* Slider wrapper */
+.hero-slider {
+	position: relative;
+	width: 100%;
+	height: 600px;
+	overflow: hidden;
+	background-color: var(--dark-blue);
+}
+
+/* Shared video layer — stays outside Swiper slides to avoid iOS clone/transform issues */
+.hero-slider-video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	z-index: 0;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+}
+
+.hero-slider.is-video-active .hero-slider-video {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* Each slide */
+.hero-slider .swiper-wrapper {
+	position: relative;
+	z-index: 1;
+}
+
+.hero-slider .swiper-slide {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.hero-slider .swiper-slide .container{
+	height: 100%;
+	position: relative;
+    z-index: 15;
+}
+
+/* Background image / video */
+.banner-bg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+}
+
+.banner-bg img,
+.banner-bg video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	min-width: 100%;
+	min-height: 100%;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+}
+
+
+/* Slide content */
+.slider-bg{
+    position: absolute;
+    inset: 0;
+    background: var(--banner-gradient), url(assets/images/dotted-bg.png);
+    z-index: 1;
+    display: inline-block;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    gap: 25px;
+    max-width: calc(100% - 240px);
+    margin: 0 auto;
+    /* Promote to own GPU layer — prevents Safari clone-swap repaint */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Tag pill — glassmorphism */
+.banner-tag {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 20px;
+    min-height: 36px;
+    min-width: 170px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    border-radius: 50px;
+
+    /* Frosted glass fill */
+    background: rgb(255 255 255 / 10%);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    /* Uniform base border — subtle all around */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+
+    /* Glass light effect:
+       - inset top-left bright highlight  (-45° light source at 80%)
+       - inset bottom-right dark shadow
+       - outer subtle depth shadow */
+    box-shadow:
+        inset  1px  1px  0px rgba(255, 255, 255, 0.55),
+        inset -1px -1px  0px rgba(0, 0, 0, 0.30);
+
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+    letter-spacing: 0.3px;
+}
+
+.banner-tag::before {
+    content: none;
+}
+
+/* Slide heading */
+.banner-content h1 {
+    font-size: 54px;
+	font-weight: 700;
+	line-height: 1.15;
+	background: var(--title-light-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-flex;
+	margin: 0;
+}
+
+/* Slide description */
+.banner-content p {
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 1.6;
+	color: rgba(255, 255, 255, 0.88);
+	margin: 0;
+}
+
+/* CTA button */
+.banner-btn.common-cta-btn {
+	min-width: 160px;
+	transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.banner-btn:hover {
+	background-color: var(--dark-blue);
+	border-color: var(--dark-blue);
+	color: var(--white);
+	transform: translateY(-1px);
+}
+
+/* Navigation arrows */
+.hero-slider .swiper-button-prev,
+.hero-slider .swiper-button-next {
+	width: 48px;
+	height: 48px;
+	background-color: transparent;
+	border: 0;
+	border-radius: 0;
+	transition: background-color 0.2s ease;
+}
+
+.hero-slider .swiper-button-prev{
+    left: 130px;
+}
+
+.hero-slider .swiper-button-next{
+    right: 130px;
+}
+
+.hero-slider .swiper-button-prev::after,
+.hero-slider .swiper-button-next::after {
+	font-size: 26px;
+	font-weight: 700;
+	color: var(--white);
+}
+
+/* Pagination dots */
+.hero-slider .swiper-pagination {
+	bottom: 20px;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-slider .swiper-pagination-bullet {
+	width: 10px;
+	height: 2px;
+	background-color: rgba(255, 255, 255, 0.5);
+	opacity: 1;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+	border-radius: 20px;
+}
+
+.hero-slider .swiper-pagination-bullet-active {
+	background-color: var(--white);
+    width: 18px;
+    height: 4px;
+}
+
+@media (max-width: 1440px) {
+    .hero-slider .swiper-button-prev{
+        left: 50px;
+    }
+
+    .hero-slider .swiper-button-next{
+        right: 50px;
+    }
+}
+
+@media (max-width: 1399px){
+    .hero-slider {
+		height: 500px;
+	}
+
+	.hero-slider .swiper-button-prev{
+        left: 72px;
+    }
+
+    .hero-slider .swiper-button-next{
+        right: 72px;
+    }
+
+}
+
+@media (max-width: 1199px){
+    .hero-slider {
+        height: 450px;
+    }
+}
+
+@media (max-width: 991px) {
+    .logo-slider-section {
+        padding: 35px 0;
+    }
+
+	.hero-slider {
+        height: 400px;
+	}
+
+	.banner-content h1 {
+		font-size: 36px;
+	}
+
+	.banner-content {
+        max-width: calc(100% - 100px);
+    }
+}
+
+@media (max-width: 575px) {
+	.hero-slider {
+		height: 350px;
+	}
+
+	.banner-content h1{
+		font-size: 28px;
+	}
+
+	.banner-content p {
+        font-size: 16px;
+    }
+
+	.banner-content{
+		gap: 15px;
+		max-width: 100%;
+	}
+
+	.banner-tag {
+		font-size: 12px;
+		padding: 5px 12px;
+		min-height: 32px;
+		min-width: 150px;
+	}
+
+	.banner-btn {
+		padding: 10px 20px;
+		font-size: 14px;
+	}
+}
