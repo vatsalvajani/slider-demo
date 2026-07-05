@@ -17,15 +17,25 @@ var heroSwiper = new Swiper('.hero-slider', {
     },
     // Add this event listener to handle video playback smoothly
     on: {
-        slideChange: function () {
-            // Find any video in the currently active slide and play it
-            const activeSlide = this.slides[this.activeIndex];
-            const video = activeSlide.querySelector('video');
-            if (video) {
-                video.play().catch(error => {
-                    console.log("Autoplay was prevented by browser:", error);
-                });
+        init: function () {
+            // Find video in the initially active visible slide and play it
+            const activeVideo = this.el.querySelector('.swiper-slide-active video');
+            if (activeVideo) {
+                activeVideo.play().catch(err => console.log("Init play blocked:", err));
             }
         },
-    },
+        slideChangeTransitionEnd: function () {
+            // Stop all slider videos first to prevent ghost audio/background processes
+            const allVideos = this.el.querySelectorAll('video');
+            allVideos.forEach(video => video.pause());
+
+            // Target ONLY the video in the active visible slide
+            const activeVideo = this.el.querySelector('.swiper-slide-active video');
+            if (activeVideo) {
+                activeVideo.play().catch(err => {
+                    console.log("Autoplay was prevented by Safari:", err);
+                });
+            }
+        }
+    }
 });
