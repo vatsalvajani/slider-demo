@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Venue Showcase — Swiper Slider Demo</title>
+
+<!-- Bootstrap (grid + utilities) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Swiper -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<!-- Fonts: distinctive serif/sans pairing -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:        #17181a;   /* near-black background */
+    --ivory:      #f2ede4;   /* warm ivory text */
+    --brass:      #b8935f;   /* brass/gold accent */
+    --teal:       #3a5a54;   /* muted teal accent */
+    --line:       rgba(242,237,228,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--ivory);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh; /* correct viewport height on iOS Safari */
+    overflow:hidden;
+  }
+
+  /* ---------- Header / brand mark ---------- */
+  .brandbar{
+    position:absolute;
+    top:0; left:0; right:0;
+    z-index:20;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1.5rem clamp(1.25rem, 4vw, 3rem);
+    pointer-events:none;
+  }
+  .brandbar .mark{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.1rem, 2vw, 1.4rem);
+    letter-spacing:0.02em;
+  }
+  .brandbar .mark span{ color:var(--brass); }
+  .brandbar .tag{
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:rgba(242,237,228,0.55);
+  }
+
+  /* ---------- Swiper base ---------- */
+  .venueSwiper{ width:100%; height:100%; }
+
+  .slide{
+    position:relative;
+    width:100%; height:100%;
+    display:flex; align-items:flex-end;
+  }
+  .slide-media{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    background:#0d0d0e;
+  }
+  .slide-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(15,14,13,0.05) 0%, rgba(15,14,13,0.15) 45%, rgba(15,14,13,0.88) 100%);
+    z-index:1;
+  }
+
+  .slide-copy{
+    position:relative;
+    z-index:2;
+    width:100%;
+    padding:0 clamp(1.25rem, 4vw, 3.5rem) clamp(4.5rem, 10vh, 6rem);
+  }
+  .slide-eyebrow{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    font-size:0.72rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:0.75rem;
+  }
+  .slide-eyebrow::before{
+    content:"";
+    width:26px; height:1px;
+    background:var(--brass);
+    display:inline-block;
+  }
+  .slide-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(2rem, 5.5vw, 4rem);
+    line-height:1.02;
+    margin:0 0 0.6rem;
+    max-width:14ch;
+  }
+  .slide-desc{
+    font-size:0.98rem;
+    color:rgba(242,237,228,0.72);
+    max-width:46ch;
+    line-height:1.55;
+  }
+
+  /* ---------- Video-specific chrome ---------- */
+  .video-toggle{
+    position:absolute;
+    z-index:3;
+    right:clamp(1.25rem, 4vw, 3.5rem);
+    bottom:clamp(4.5rem, 10vh, 6rem);
+    width:52px; height:52px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:rgba(23,24,26,0.55);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .video-toggle:hover{ border-color:var(--brass); }
+  .video-toggle svg{ width:16px; height:16px; fill:var(--ivory); }
+  .video-toggle .icon-pause{ display:none; }
+  .video-toggle.is-playing .icon-play{ display:none; }
+  .video-toggle.is-playing .icon-pause{ display:block; }
+
+  .sound-badge{
+    position:absolute;
+    z-index:3;
+    left:clamp(1.25rem, 4vw, 3.5rem);
+    bottom:clamp(4.5rem, 10vh, 6rem);
+    font-size:0.7rem;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:rgba(242,237,228,0.55);
+    border:1px solid var(--line);
+    padding:0.5rem 0.9rem;
+    border-radius:999px;
+    background:rgba(23,24,26,0.4);
+  }
+
+  /* ---------- Custom pagination: labelled ticks, not dots ---------- */
+  .reel-index{
+    position:absolute;
+    z-index:20;
+    top:50%;
+    right:clamp(1rem, 3vw, 2.25rem);
+    transform:translateY(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.9rem;
+  }
+  .reel-index .swiper-pagination-bullet{
+    width:auto; height:auto;
+    background:none;
+    opacity:1;
+    border-radius:0;
+    margin:0 !important;
+    font-family:'Fraunces', serif;
+    font-size:0.85rem;
+    color:rgba(242,237,228,0.4);
+    position:relative;
+    padding:0.2rem 0;
+    cursor:pointer;
+    transition:color .25s ease;
+  }
+  .reel-index .swiper-pagination-bullet::after{
+    content:"";
+    display:block;
+    width:1px; height:0;
+    background:var(--brass);
+    margin:0.35rem auto 0;
+    transition:height .35s ease;
+  }
+  .reel-index .swiper-pagination-bullet-active{
+    color:var(--ivory);
+  }
+  .reel-index .swiper-pagination-bullet-active::after{
+    height:22px;
+  }
+
+  /* ---------- Nav arrows ---------- */
+  .swiper-button-prev, .swiper-button-next{
+    color:var(--ivory);
+    --swiper-navigation-size: 18px;
+    width:44px; height:44px;
+    top:auto;
+    bottom:clamp(1.5rem, 4vh, 2.25rem);
+    border:1px solid var(--line);
+    border-radius:50%;
+    background:rgba(23,24,26,0.45);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+  .swiper-button-prev{ left:auto; right:5.2rem; }
+  .swiper-button-next{ right:1.5rem; }
+  .swiper-button-prev::after, .swiper-button-next::after{ font-size:14px; }
+
+  @media (max-width: 767.98px){
+    .reel-index{ display:none; } /* keep mobile chrome minimal */
+    .slide-copy{ padding-bottom:6.5rem; }
+    .video-toggle{ width:46px; height:46px; }
+    .sound-badge{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="brandbar">
+    <div class="mark">The Pavilion<span>·</span></div>
+    <div class="tag">Facilities Showcase</div>
+  </div>
+
+  <div class="swiper venueSwiper">
+    <div class="swiper-wrapper">
+
+      <!-- Slide 1: Image -->
+      <div class="swiper-slide slide" data-type="image">
+        <img
+          class="slide-media"
+          src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop"
+          alt="Grand hall interior"
+          loading="eager"
+        />
+        <div class="slide-scrim"></div>
+        <div class="slide-copy">
+          <div class="slide-eyebrow">Space 01</div>
+          <h2 class="slide-title">The Grand Hall</h2>
+          <p class="slide-desc">A column-free space with 6-metre ceilings, built for proceedings that need both formality and light.</p>
+        </div>
+      </div>
+
+      <!-- Slide 2: Video -->
+      <div class="swiper-slide slide" data-type="video">
+        <video
+          class="slide-media"
+          playsinline
+          webkit-playsinline="true"
+          muted
+          loop
+          preload="auto"
+          poster="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop"
+        >
+          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+        </video>
+        <div class="slide-scrim"></div>
+
+        <button class="video-toggle" type="button" aria-label="Play or pause video">
+          <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <div class="sound-badge">Muted preview</div>
+
+        <div class="slide-copy">
+          <div class="slide-eyebrow">Space 02</div>
+          <h2 class="slide-title">The Courtyard Suite</h2>
+          <p class="slide-desc">An open-air breakout room framed by water and stone — a walkthrough, in motion.</p>
+        </div>
+      </div>
+
+      <!-- Slide 3: Image (shows the "multiple slides" requirement) -->
+      <div class="swiper-slide slide" data-type="image">
+        <img
+          class="slide-media"
+          src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1600&auto=format&fit=crop"
+          alt="Private meeting room"
+          loading="lazy"
+        />
+        <div class="slide-scrim"></div>
+        <div class="slide-copy">
+          <div class="slide-eyebrow">Space 03</div>
+          <h2 class="slide-title">The Chambers</h2>
+          <p class="slide-desc">Four private rooms for counsel and witnesses, each soundproofed and independently accessed.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pagination -->
+    <div class="swiper-pagination reel-index"></div>
+    <!-- Nav -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  const swiper = new Swiper('.venueSwiper', {
+    loop: true,
+    speed: 700,
+    watchSlidesProgress: true,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true,
+      renderBullet: function (index, className) {
+        const labels = ['01', '02', '03'];
+        return '<span class="' + className + '">' + (labels[index] || (index + 1)) + '</span>';
+      }
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    },
+    keyboard: { enabled: true },
+    a11y: { enabled: true }
+  });
+
+  /*
+   * Video handling tuned for Safari (macOS + iOS) and Chrome:
+   * - muted + playsinline + webkit-playsinline are required for iOS Safari
+   *   to allow autoplay/inline playback at all.
+   * - We only call .play()/.pause() on the ACTIVE slide's video, and always
+   *   pause + reset every other video. Safari can throw on interrupted
+   *   play() promises, so every play() call is wrapped and its promise caught.
+   * - autoplay is triggered manually (not via the autoplay attribute) once
+   *   the slide becomes active, which is more reliable across browsers
+   *   than relying on the attribute alone during swipe transitions.
+   */
+  function getVideo(slideEl){
+    return slideEl ? slideEl.querySelector('video.slide-media') : null;
+  }
+
+  function safePlay(video){
+    if (!video) return;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay was blocked (rare once muted+playsinline are set) —
+        // fail silently, user can still tap the play button.
+      });
+    }
+  }
+
+  function syncActiveVideo(){
+    // Pause every video first
+    document.querySelectorAll('video.slide-media').forEach(v => {
+      if (!v.closest('.swiper-slide-active')) {
+        v.pause();
+      }
+    });
+    // Play the active slide's video, if any, and sync the toggle icon
+    const activeSlide = swiper.slides[swiper.activeIndex];
+    const video = getVideo(activeSlide);
+    const toggle = activeSlide ? activeSlide.querySelector('.video-toggle') : null;
+    if (video) {
+      safePlay(video);
+      if (toggle) toggle.classList.add('is-playing');
+    }
+  }
+
+  swiper.on('slideChangeTransitionEnd', syncActiveVideo);
+  // Run once on load in case the first active slide is the video slide
+  window.addEventListener('DOMContentLoaded', syncActiveVideo);
+
+  // Manual play/pause toggle button on the video slide
+  document.querySelectorAll('.video-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slide = btn.closest('.swiper-slide');
+      const video = getVideo(slide);
+      if (!video) return;
+      if (video.paused) {
+        safePlay(video);
+        btn.classList.add('is-playing');
+      } else {
+        video.pause();
+        btn.classList.remove('is-playing');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
